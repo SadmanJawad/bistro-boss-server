@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const port = process.env.PORT || 5000;
+var jwt = require('jsonwebtoken');
 require('dotenv').config()
 
 // middleware
@@ -56,8 +57,9 @@ async function run() {
         res.send(result);
     })
 
-    app.patch('users/admin/:id', async(req,res) => {
+    app.patch('/users/admin/:id', async(req,res) => {
       const id = req.params.id;
+      console.log(id);
      const filter = { _id : new ObjectId(id) };
       const updateDoc = {
       $set: {
@@ -67,7 +69,7 @@ async function run() {
 
     const result = await usersCollection.updateOne(filter, updateDoc);
     res.send(result);
-    
+
 
 
     })

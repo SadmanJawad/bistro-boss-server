@@ -27,7 +27,6 @@ const verifyJWT = (req, res, next) => {
 }
 
 
-
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ixkqk3t.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -62,11 +61,6 @@ async function run() {
         res.send(result)
     })
 
-
-
-
-
-
     app.post('/users', async (req, res) => {
         const user = req.body;
         
@@ -78,6 +72,23 @@ async function run() {
         }
         const result = await usersCollection.insertOne(user);
         res.send(result);
+    })
+    // security layer : verifyJWT
+    // email same
+    // check if admin
+    app.get('/users/admin/:email' , verifyJWT, async (req,res) => {
+
+      const email = req.params.email;
+
+      if(req.decoded.email !== email){
+        res.send({admin: false})
+      }
+
+      const query = { email : email };
+      const user = await usersCollection.findOne(query);
+      const result = {admin: user.role === 'admin'};
+      res.send(result);
+
     })
 
     app.patch('/users/admin/:id', async(req,res) => {
@@ -96,9 +107,6 @@ async function run() {
 
 
     })
-
-
-
 
 // menu related api
     app.get('/menu', async (req, res) => {
